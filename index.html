@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audioguida di Milano</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #333;
+        }
+        h1 {
+            color: #CC0000;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+        }
+        button {
+            background-color: #CC0000;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #A00000;
+            transform: translateY(-2px);
+        }
+        button:active {
+            background-color: #800000;
+            transform: translateY(0);
+        }
+        audio {
+            width: 100%;
+            margin-top: 30px;
+            max-width: 600px;
+        }
+        .current-playing {
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #555;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Audioguida dei Monumenti di Milano</h1>
+
+    <div class="container">
+        <button onclick="playAudio('cenacolo.mp3', 'Cenacolo Vinciano')">Cenacolo Vinciano</button>
+        <button onclick="playAudio('sant-ambrogio.mp3', 'Basilica di Sant\'Ambrogio')">Sant'Ambrogio</button>
+        <button onclick="playAudio('sant-eustorgio.mp3', 'Basilica di Sant\'Eustorgio')">Sant'Eustorgio</button>
+        <button onclick="playAudio('monastero-s-maurizio.mp3', 'Monastero Maggiore di San Maurizio')">Monastero S. Maurizio</button>
+    </div>
+
+    <div class="current-playing" id="currentPlaying"></div>
+
+    <audio id="mainAudio" controls autoplay></audio>
+
+    <audio id="backgroundMusic" loop autoplay>
+        <source src="o-mia-bella-madunina.mp3" type="audio/mpeg">
+        Il tuo browser non supporta l'elemento audio.
+    </audio>
+
+    <script>
+        const mainAudio = document.getElementById('mainAudio');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const currentPlayingDiv = document.getElementById('currentPlaying');
+
+        function playAudio(filename, monumentName) {
+            mainAudio.src = filename;
+            mainAudio.play();
+            currentPlayingDiv.textContent = `Ora in ascolto: ${monumentName}`;
+            // Metti in pausa la musica di sottofondo quando parte un'audioguida
+            backgroundMusic.pause();
+        }
+
+        // Riprendi la musica di sottofondo quando l'audioguida finisce
+        mainAudio.onended = function() {
+            backgroundMusic.play();
+            currentPlayingDiv.textContent = '';
+        };
+
+        // Gestione iniziale della riproduzione della musica di sottofondo
+        // Alcuni browser bloccano l'autoplay senza interazione utente.
+        // Puoi aggiungere un pulsante "Riproduci musica di sottofondo"
+        // o istruire l'utente a interagire per farla partire.
+        document.addEventListener('DOMContentLoaded', () => {
+            backgroundMusic.volume = 0.4; // Imposta un volume più basso per la musica di sottofondo
+            try {
+                backgroundMusic.play().catch(error => {
+                    console.log("Autoplay della musica di sottofondo bloccato:", error);
+                    // Potresti mostrare un messaggio all'utente per farla partire
+                });
+            } catch (error) {
+                console.log("Errore durante il tentativo di riproduzione della musica di sottofondo:", error);
+            }
