@@ -1,1 +1,120 @@
-https://wledonne.github.io/APP-1/
+
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audioguida di Milano</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font for a cleaner look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light gray background */
+        }
+        /* Style for the message box */
+        #message-box {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl max-w-2xl w-full text-center">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-8">Audioguida di Milano</h1>
+
+        <p class="text-lg text-gray-600 mb-8">Seleziona un monumento per ascoltare la sua audioguida.</p>
+
+        <div class="flex flex-col md:flex-row justify-center gap-6">
+            <button id="cenacolo-button" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-400 focus:ring-opacity-75 text-xl">
+                Cenacolo Vinciano
+            </button>
+
+            <button id="santambrogio-button" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-400 focus:ring-opacity-75 text-xl">
+                Sant'Ambrogio
+            </button>
+        </div>
+
+        <div id="message-box"></div>
+
+    </div>
+
+    <script>
+        // JavaScript for audio playback
+        document.addEventListener('DOMContentLoaded', () => {
+            const cenacoloButton = document.getElementById('cenacolo-button');
+            const santambrogioButton = document.getElementById('santambrogio-button');
+            const messageBox = document.getElementById('message-box');
+
+            // Placeholder audio URLs. You should replace these with your actual audio files.
+            // Example: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+            const audioUrls = {
+                cenacolo: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', // Replace with actual Cenacolo audio
+                santambrogio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' // Replace with actual Sant'Ambrogio audio
+            };
+
+            let currentAudio = null; // To keep track of the currently playing audio
+
+            // Function to show a temporary message
+            const showMessage = (message) => {
+                messageBox.textContent = message;
+                messageBox.style.display = 'block';
+                setTimeout(() => {
+                    messageBox.style.display = 'none';
+                }, 3000); // Hide after 3 seconds
+            };
+
+            // Function to play or pause audio
+            const toggleAudio = (audioKey, buttonText) => {
+                // If there's an audio playing, pause it
+                if (currentAudio && !currentAudio.paused) {
+                    currentAudio.pause();
+                    showMessage(`Audio di ${buttonText} messo in pausa.`);
+                    // If the current audio is the same as the one being requested, just pause and return
+                    if (currentAudio.src === audioUrls[audioKey]) {
+                        currentAudio = null; // Clear current audio
+                        return;
+                    }
+                }
+
+                // Create a new audio object if it's a different audio or no audio is playing
+                currentAudio = new Audio(audioUrls[audioKey]);
+                currentAudio.play()
+                    .then(() => {
+                        showMessage(`Riproduzione audioguida: ${buttonText}`);
+                    })
+                    .catch(error => {
+                        console.error('Errore durante la riproduzione dell\'audio:', error);
+                        showMessage(`Impossibile riprodurre l'audio per ${buttonText}. Controlla la console per i dettagli.`);
+                    });
+
+                // Event listener for when the audio ends
+                currentAudio.onended = () => {
+                    showMessage(`Audioguida di ${buttonText} terminata.`);
+                    currentAudio = null; // Clear current audio when it ends
+                };
+            };
+
+            // Add event listeners to buttons
+            cenacoloButton.addEventListener('click', () => {
+                toggleAudio('cenacolo', 'Cenacolo Vinciano');
+            });
+
+            santambrogioButton.addEventListener('click', () => {
+                toggleAudio('santambrogio', 'Sant\'Ambrogio');
+            });
+        });
+    </script>
+</body>
+</html>
+
